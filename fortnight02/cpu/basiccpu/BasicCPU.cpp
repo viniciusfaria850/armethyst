@@ -100,7 +100,7 @@ int BasicCPU::ID()
 	//		Acrescente os cases no switch já iniciado, para detectar o grupo
 	//		APENAS PARA A INSTRUÇÃO A SEGUIR:
 	//				'add w1, w1, w0'
-	//		que aparece na linha 40 de isummation.S e no endereço 0x74
+	//		que aparece na linha 43 de isummation.S e no endereço 0x68
 	//		de txt_isummation.o.txt.
 	//
 	// 		Deve-se detectar em IR o grupo da qual a instrução faz parte e
@@ -108,7 +108,7 @@ int BasicCPU::ID()
 	//		é o sufixo do nome da função que decodifica as instruções daquele
 	//		grupo. Para 'add w1, w1, w0' deve-se chamar 'decodeDataProcReg()'.
 	
-	int group = IR & 0x1E000000; // bits 28-25
+	int group = IR & 0x1E000000; // bits 28-25 IR=0x0b000021
 	
 	switch (group)
 	{
@@ -120,6 +120,12 @@ int BasicCPU::ID()
 			break;
 		// case TODO
 		// x101 Data Processing -- Register on page C4-278
+		case 0x0A000000:   //caso x=0
+  		case 0x1A000000:	//caso x=1
+			fpOP = false;
+			return decodeDataProcReg();
+			break;
+			
 		default:
 			return 1; // instrução não implementada
 	}
@@ -224,15 +230,36 @@ int BasicCPU::decodeLoadStore() {
  *		   1: se a instrução não estiver implementada.
  */
 int BasicCPU::decodeDataProcReg() {
+	unsigned int n, d,m;
 	// TODO
 	//		acrescentar um switch no estilo do switch de decodeDataProcImm,
 	//		e implementar APENAS PARA A INSTRUÇÃO A SEGUIR:
 	//				'add w1, w1, w0'
-	//		que aparece na linha 40 de isummation.S e no endereço 0x74
+	//		que aparece na linha 43 de isummation.S e no endereço 0x68
 	//		de txt_isummation.o.txt.
 	
+	switch (IR & 0x7F200000)
+	{
+		case 0x0B000000: //para o caso 64bits. 
+		
 	
-	// instrução não implementada
+	
+			n = (IR & 0x000003E0) >> 5;
+			A = getW(n); // 64-bit variant
+			m = (IR & 0x001F0000) >> 16;
+			B = getW(m);
+			d=(IR & 0x0000001F);
+			Rd = &(R[d]);
+			
+			
+			
+			
+			return 0;
+			
+		default:
+			// instrução não implementada
+			return 1;
+	}
 	return 1;
 }
 
@@ -266,7 +293,7 @@ int BasicCPU::EXI()
 	//		Acrescente os cases no switch já iniciado, para acrescentar a
 	//		execução APENAS PARA A INSTRUÇÃO A SEGUIR:
 	//				'add w1, w1, w0'
-	//		que aparece na linha 40 de isummation.S e no endereço 0x74
+	//		que aparece na linha 43 de isummation.S e no endereço 0x68
 	//		de txt_isummation.o.txt.
 	//
 	// 		Verifique que ALUctrlFlag já tem declarado o tipo de operação
