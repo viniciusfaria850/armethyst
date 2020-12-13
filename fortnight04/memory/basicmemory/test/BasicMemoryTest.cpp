@@ -32,76 +32,86 @@
 
    ----------------------------------------------------------------------------
 */
-#include "SimpleMemoryTest.h"
+#include "BasicMemoryTest.h"
 
 #include <iostream>
 #include <iomanip>
 
 using namespace std;
 
-SimpleMemoryTest::SimpleMemoryTest(int size) : SimpleMemory{size}
+BasicMemoryTest::BasicMemoryTest(int size) : BasicMemory{size}
 {
     memLogStream.open(MEMORY_LOG_FILE);
 }
-SimpleMemoryTest::~SimpleMemoryTest()
+BasicMemoryTest::~BasicMemoryTest()
 {
 	memLogStream.close();
 }
 
 /**
- * Log de Memory::readInstruction32(long address)
+ * Log de BasicMemory::readInstruction32(long address)
  */
-unsigned int SimpleMemoryTest::readInstruction32(unsigned long address)
+uint32_t BasicMemoryTest::readInstruction32(uint64_t address)
 {
     memLogStream << hex << "ri " << setfill('0') << setw(16) << address << endl;
- 	return SimpleMemory::readInstruction32(address);
+ 	return BasicMemory::readInstruction32(address);
 }
 
 /**
- * Log de Memory::readData32(long address)
+ * Log de BasicMemory::readData32(uint64_t address)
  */
-int SimpleMemoryTest::readData32(unsigned long address)
+uint32_t BasicMemoryTest::readData32(uint64_t address)
 {
     memLogStream << hex << "rd " << setfill('0') << setw(16) << address << endl;
 	lastDataMemAccess = MemAccessType::MAT_READ32;
- 	return SimpleMemory::readData32(address);
+ 	return BasicMemory::readData32(address);
 }
 
 /**
- * Log de Memory::readData64(long address)
+ * Log de BasicMemory::readData64(uint64_t address)
  */
-long SimpleMemoryTest::readData64(unsigned long address)
+uint64_t BasicMemoryTest::readData64(uint64_t address)
 {
     memLogStream << hex << "rd " << setfill('0') << setw(16) << address << endl;
 	lastDataMemAccess = MemAccessType::MAT_READ64;
- 	return SimpleMemory::readData64(address);
+ 	return BasicMemory::readData64(address);
 }
 
 /**
- * Log de Memory::writeData32(long address)
+ * Log de BasicMemory::writeInstruction32(uint64_t address)
  */
-void SimpleMemoryTest::writeData32(unsigned long address, int value)
+void BasicMemoryTest::writeInstruction32(uint64_t address, uint32_t value)
+{
+    memLogStream << hex << "wi " << setfill('0') << setw(16) << address << endl;
+	lastDataMemAccess = MemAccessType::MAT_WRITE32;
+ 	BasicMemory::writeInstruction32(address, value);
+}
+
+/**
+ * Log de BasicMemory::writeData32(uint64_t address)
+ */
+void BasicMemoryTest::writeData32(uint64_t address, uint32_t value)
 {
     memLogStream << hex << "wd " << setfill('0') << setw(16) << address << endl;
 	lastDataMemAccess = MemAccessType::MAT_WRITE32;
- 	SimpleMemory::writeData32(address, value);
+ 	BasicMemory::writeData32(address, value);
 }
 
 /**
- * Log de Memory::writeData64(long address)
+ * Log de BasicMemory::writeData64(uint64_t address)
  */
-void SimpleMemoryTest::writeData64(unsigned long address, long value)
+void BasicMemoryTest::writeData64(uint64_t address, uint64_t value)
 {
     memLogStream << hex << "wd " << setfill('0') << setw(16) << address << endl;
 	lastDataMemAccess = MemAccessType::MAT_WRITE64;
- 	SimpleMemory::writeData64(address, value);
+ 	BasicMemory::writeData64(address, value);
 }
 
-SimpleMemoryTest::MemAccessType SimpleMemoryTest::getLastDataMemAccess() {
+BasicMemoryTest::MemAccessType BasicMemoryTest::getLastDataMemAccess() {
 	return lastDataMemAccess;
 }
 
-void SimpleMemoryTest::resetLastDataMemAccess() {
+void BasicMemoryTest::resetLastDataMemAccess() {
 	lastDataMemAccess = MemAccessType::MAT_NONE;
 }
 
@@ -113,7 +123,7 @@ void SimpleMemoryTest::resetLastDataMemAccess() {
 #define ADDR_COL_SPACE 4
 #define WORD_SIZE 4
 #define WORDS_PER_LINE 4
-void SimpleMemoryTest::writeBinaryAsTextELF (string basename) {
+void BasicMemoryTest::writeBinaryAsTextELF (string basename) {
     string filename = "elf_" + basename + ".txt";
     ofstream ofp;
     int i,j;
@@ -177,7 +187,7 @@ void SimpleMemoryTest::writeBinaryAsTextELF (string basename) {
  * 
  * Específico para o arquivo de teste usado.
  */
-void SimpleMemoryTest::relocateManual() {
+void BasicMemoryTest::relocateManual() {
 	unsigned int *uiData = (unsigned int *)data;
 	long address;
 	unsigned int instruction;
